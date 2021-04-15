@@ -22,5 +22,24 @@ It takes two string arguments and prints 1 if they are a JKP or 0 if they aren�
 
 ```bash
 gcc isJKP.c -o JKP
-./JKP
+./JKP racisT SupremAcist
 ```
+## 2 Calculator function
+
+It calculates the result of an arithmetic string expression (as if your program acts as a calculator). 
+
+The input is supplied from the terminal as a string expression and the output is an integer.
+
+● Assume the operands are NON-NEGATIVE numbers (0,1,2,..), and each operand can be of arbitrary any number of digits.
+
+● Assume the only operator used is only + and NO brackets and NO spaces
+
+### 2.1 To run on Linux using gcc
+
+```bash
+gcc calculator.c -o calculator
+./calculator 111+222+333+111
+>>777
+```
+
+
