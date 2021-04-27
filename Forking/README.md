@@ -20,6 +20,9 @@ Input File Format:
 - The first line in the file indicates the number of students (S) in the list. - Each line in the following S lines represents the grades of a single student. It consists of two integers
 separated by a space. The first integer is the grade of the student in the midterm exam and the second integer is the grade of the student in the final exam.
 
+- Expected Output:
+2 1 2
+
 ### To run Program on Linux using gcc
 ```bash
 gcc passCounter.c -o passCounter.o
