@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 
 #define children 2
+
 int value;
 int pid,stat_loc;
 int n;
@@ -20,67 +21,81 @@ void main(int argc,char**argv){
 		value=atoi(argv[1]);
 		//printf("%d\n",value);
 		int flag=1;
+		int flag1=0;
+		int flag2=0;
 		n=argc-2;
 		int*arr=malloc(sizeof(int)*n);
 		for(int j=0;j<n;j++)
   		arr[j]=atoi(argv[j+2]);
 		//printf("%d	%d	%d",arr[0],arr[2],arr[7]);
 		pidArr=malloc(sizeof(int)*3);
+		for(int z=0;z<children+1;z++)
+			pidArr[z]=0;
 		signal(SIGUSR1,USRhandler);	  		
 			  	  	
-			  	  
+		printf("\nI am the parent,PID = %d\n",getpid());
+		pidArr[children+1]=getpid();  	  
 		
-		for(int i=0;i<children;i++)
-		{
-			pid=fork();
-			
 		
+			(pidArr[0]=fork())&&(pidArr[1]=fork());
 			if (pid== -1)
 	  				perror("error in fork");
 	  	
-	  		else if (pid == 0) //child
+	  		else if (pidArr[0] == 0) //child 1
 			 	{ 
-			 	pidArr[i]=getpid();
-			 		if(i==0)
-			 		{
-			 			printf("I am the first child,PID = %d, PPID = %d \n",getpid(),getppid());
-			 			for(int k=0;k<n/2;k++)
+			 	pidArr[0]=getpid();
+			 	
+	 			printf("\nI am the first child,PID = %d, PPID = %d \n",getpid(),getppid());
+			 		for(int k=0;k<n/2;k++)
 			 			{
 			 				if(arr[k]==value)
 			 					{
 			 					kill(getppid(),SIGUSR1);
 			 					exit(k);
+			 					flag1=1;
 			 					}	
 			 			}
+			 			sleep(3);
+			 			printf("\nChild 1 terminates\n");
+			 			exit(0);
 			 		}
-			 		else
+			 		else if(pidArr[1] == 0) //child 2
 			 		{
-			 			printf("I am the second child,PID = %d, PPID = %d \n",getpid(),getppid());
+			 			pidArr[1]=getpid();
+			 			printf("\nI am the second child,PID = %d, PPID = %d \n",getpid(),getppid());
 			 			for(int k=n/2;k<n;k++)
 			 			{
 			 				if(arr[k]==value)
 			 				{
 			 					kill(getppid(),SIGUSR1);
 			 					exit(k);
+			 					flag2=1;
 			 					}	
 			 			}
+			 			sleep(3);
+			 			printf("\nChild 2 terminates\n");
+			 			exit(0);
 			 		
 			 		}
-			  	   
-			  	} 
-			 
-			 else 	//parent
-			  	{
-			  		pidArr[children+1]=getpid();
-			  		if(i==0)
-			  		printf("I am the parent,PID = %d\n",getpid());
-			  		
-		}
-	
+			 		else
+			 			{
+			 			sleep(5);
+			 			pid= wait(&stat_loc);
+	if(!(stat_loc & 0x00FF))
+	{
+			printf("\nA child with pid %d terminated with exit code %d\n", pidArr[0], stat_loc>>8);
+		printf("\nA child with pid %d terminated with exit code %d\n", pidArr[1], stat_loc>>8);	
+		printf("Value not found\n");
+		exit(0);
 	}
+			 			}
+		
+		
+			
+	
+}
+}
 
-}
-}
 void USRhandler(int signum)//the parent as child process send SIGUSR1 to its PID
 {
 	pid= wait(&stat_loc);
@@ -90,7 +105,7 @@ void USRhandler(int signum)//the parent as child process send SIGUSR1 to its PID
 			printf("child 1: Value found at position %d\n", stat_loc>>8);	
 		else
 			printf("child 2: Value found at position %d\n", stat_loc>>8);
-		for(int i=0;i<children;i++)
+		for(int i=0;i<=children;i++)
 		kill(pidArr[i],SIGKILL);
 	}
   	    
