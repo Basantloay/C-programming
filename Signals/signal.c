@@ -37,12 +37,32 @@ void main(int argc,char**argv){
 		pidArr[children+1]=getpid();  	  
 		
 		
-			(pidArr[0]=fork())&&(pidArr[1]=fork());
+			(pidArr[1]=fork())&&(pidArr[0]=fork());
 			if (pid== -1)
 	  				perror("error in fork");
-	  	
+	  		else if(pidArr[1] == 0) //child 2
+			 		{
+			 		flag=0;
+			 			pidArr[1]=getpid();
+			 			printf("\nI am the second child,PID = %d, PPID = %d \n",getpid(),getppid());
+			 			for(int k=n/2;k<n;k++)
+			 			{
+			 				if(arr[k]==value)
+			 				{
+			 					sleep(1);
+			 					kill(getppid(),SIGUSR1);
+			 					exit(k);
+			 					flag2=1;
+			 					}	
+			 			}
+			 			sleep(3);
+			 			printf("\nChild 2 terminates\n");
+			 			exit(0);
+			 		
+			 		}
 	  		else if (pidArr[0] == 0) //child 1
 			 	{ 
+			 	flag=1;
 			 	pidArr[0]=getpid();
 			 	
 	 			printf("\nI am the first child,PID = %d, PPID = %d \n",getpid(),getppid());
@@ -50,7 +70,9 @@ void main(int argc,char**argv){
 			 			{
 			 				if(arr[k]==value)
 			 					{
+			 					sleep(1);
 			 					kill(getppid(),SIGUSR1);
+			 					
 			 					exit(k);
 			 					flag1=1;
 			 					}	
@@ -59,10 +81,39 @@ void main(int argc,char**argv){
 			 			printf("\nChild 1 terminates\n");
 			 			exit(0);
 			 		}
-			 		else if(pidArr[1] == 0) //child 2
+			 		
+			 		else
+			 			{
+			 			sleep(5);
+	pid= wait(&stat_loc);
+	if(!(stat_loc & 0x00FF))
+	{
+			printf("\nA child with pid %d terminated with exit code %d\n", pidArr[0], stat_loc>>8);
+		printf("\nA child with pid %d terminated with exit code %d\n", pidArr[1], stat_loc>>8);	
+		printf("Value not found\n");
+		exit(0);
+	}
+			 			}
+		
+		/*if (pidArr[0] == getpid()) //child 1
+			 	{ 
+			 	
+			 		for(int k=0;k<n/2;k++)
+			 			{
+			 				if(arr[k]==value)
+			 					{
+			 					kill(getppid(),SIGUSR1);
+			 					exit(k);
+			 					
+			 					}	
+			 			}
+			 			sleep(3);
+			 			printf("\nChild 1 terminates\n");
+			 			exit(0);
+			 		}
+			 		else if(pidArr[1] == getpid()) //child 2
 			 		{
-			 			pidArr[1]=getpid();
-			 			printf("\nI am the second child,PID = %d, PPID = %d \n",getpid(),getppid());
+			 			
 			 			for(int k=n/2;k<n;k++)
 			 			{
 			 				if(arr[k]==value)
@@ -77,21 +128,7 @@ void main(int argc,char**argv){
 			 			exit(0);
 			 		
 			 		}
-			 		else
-			 			{
-			 			sleep(5);
-			 			pid= wait(&stat_loc);
-	if(!(stat_loc & 0x00FF))
-	{
-			printf("\nA child with pid %d terminated with exit code %d\n", pidArr[0], stat_loc>>8);
-		printf("\nA child with pid %d terminated with exit code %d\n", pidArr[1], stat_loc>>8);	
-		printf("Value not found\n");
-		exit(0);
-	}
-			 			}
-		
-		
-			
+			*/
 	
 }
 }
